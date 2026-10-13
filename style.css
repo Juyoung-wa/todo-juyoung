@@ -66,13 +66,6 @@ h1 {
   letter-spacing: 0.02em;
 }
 
-/* 제목 아래 작은 글씨 */
-.subtitle {
-  margin: 6px 0 0;
-  font-size: 0.85rem;
-  opacity: 0.75;
-}
-
 .ball {
   display: inline-block;
   animation: spin 6s linear infinite;
