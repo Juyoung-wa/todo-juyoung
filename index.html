@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>오늘의 할 일</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 배경 그림: 선수가 찬 공이 골문에 들어가기 직전의 순간 -->
+  <div class="scene" aria-hidden="true">
+    <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#060f26"/>
+          <stop offset="1" stop-color="#1c3b6e"/>
+        </linearGradient>
+        <radialGradient id="light">
+          <stop offset="0" stop-color="#fff" stop-opacity="0.9"/>
+          <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+        </radialGradient>
+        <pattern id="crowd" width="26" height="22" patternUnits="userSpaceOnUse">
+          <rect width="26" height="22" fill="#121c33"/>
+          <circle cx="6" cy="7" r="4" fill="#e03131" opacity="0.55"/>
+          <circle cx="19" cy="6" r="4" fill="#f1f3f5" opacity="0.4"/>
+          <circle cx="12" cy="17" r="4" fill="#4dabf7" opacity="0.45"/>
+          <circle cx="24" cy="18" r="4" fill="#ffd43b" opacity="0.35"/>
+        </pattern>
+        <pattern id="net" width="16" height="16" patternUnits="userSpaceOnUse">
+          <path d="M0 0L16 16M16 0L0 16" stroke="#fff" stroke-opacity="0.4" stroke-width="1"/>
+        </pattern>
+        <linearGradient id="trail" gradientUnits="userSpaceOnUse" x1="440" y1="0" x2="1210" y2="0">
+          <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+          <stop offset="1" stop-color="#fff" stop-opacity="0.6"/>
+        </linearGradient>
+        <radialGradient id="vignette" cx="0.5" cy="0.55" r="0.75">
+          <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
+          <stop offset="1" stop-color="#000" stop-opacity="0.55"/>
+        </radialGradient>
+        <clipPath id="ball-clip"><circle r="24"/></clipPath>
+        <polygon id="patch" points="0,-8 7.6,-2.5 4.7,6.5 -4.7,6.5 -7.6,-2.5"/>
+      </defs>
+
+      <!-- 밤하늘 + 조명탑 -->
+      <rect width="1600" height="900" fill="url(#sky)"/>
+      <circle cx="180" cy="70" r="200" fill="url(#light)" opacity="0.5"/>
+      <circle cx="1420" cy="70" r="200" fill="url(#light)" opacity="0.5"/>
+      <rect x="120" y="40" width="120" height="34" rx="4" fill="#fffbe6"/>
+      <rect x="1360" y="40" width="120" height="34" rx="4" fill="#fffbe6"/>
+
+      <!-- 관중석 + 카메라 플래시 -->
+      <rect y="280" width="1600" height="132" fill="url(#crowd)"/>
+      <g fill="#fff">
+        <circle class="flash" cx="140" cy="320" r="6"/>
+        <circle class="flash" cx="520" cy="360" r="6"/>
+        <circle class="flash" cx="880" cy="300" r="6"/>
+        <circle class="flash" cx="1110" cy="380" r="6"/>
+        <circle class="flash" cx="1330" cy="330" r="6"/>
+        <circle class="flash" cx="1540" cy="370" r="6"/>
+      </g>
+
+      <!-- 광고판 -->
+      <rect y="410" width="1600" height="26" fill="#1d5e2b"/>
+      <rect y="410" width="1600" height="3" fill="#ffd43b"/>
+
+      <!-- 잔디 (멀수록 좁은 줄무늬) -->
+      <rect y="436" width="1600" height="464" fill="#2d8f3b"/>
+      <rect y="436" width="1600" height="34" fill="#34a043"/>
+      <rect y="515" width="1600" height="60" fill="#34a043"/>
+      <rect y="655" width="1600" height="105" fill="#34a043"/>
+
+      <!-- 골라인 + 골 에어리어 -->
+      <g stroke="#fff" stroke-opacity="0.8" stroke-width="4" fill="none">
+        <line x1="760" y1="700" x2="1600" y2="700"/>
+        <polyline points="1110,700 1070,790 1610,790"/>
+      </g>
+
+      <!-- 골대: 그물 -> 뒤 프레임 -> 앞 골포스트 -->
+      <g fill="url(#net)">
+        <rect x="1215" y="500" width="250" height="190"/>
+        <polygon points="1180,470 1215,500 1215,690 1180,700"/>
+        <polygon points="1500,470 1465,500 1465,690 1500,700"/>
+        <polygon points="1180,470 1500,470 1465,500 1215,500"/>
+      </g>
+      <g stroke="#fff" stroke-opacity="0.55" stroke-width="3" fill="none">
+        <polyline points="1215,690 1215,500 1465,500 1465,690"/>
+      </g>
+      <g stroke="#fff" stroke-width="10" stroke-linecap="round" fill="none">
+        <polyline points="1180,700 1180,470 1500,470 1500,700"/>
+      </g>
+
+      <!-- 그림자 -->
+      <g fill="#000" opacity="0.3">
+        <ellipse cx="335" cy="722" rx="60" ry="8"/>
+        <ellipse cx="1385" cy="702" rx="75" ry="8"/>
+        <ellipse cx="1225" cy="699" rx="20" ry="4"/>
+      </g>
+
+      <!-- 공격수: 공을 차고 난 뒤 다리를 뻗은 자세 -->
+      <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <polyline points="314,545 272,520 250,536" stroke="#e8b08a" stroke-width="11"/>
+        <polyline points="320,550 356,562 382,548" stroke="#e8b08a" stroke-width="11"/>
+        <polyline points="330,610 322,665" stroke="#e8b08a" stroke-width="15"/>
+        <polyline points="322,665 318,716" stroke="#e03131" stroke-width="14"/>
+        <line x1="316" y1="719" x2="340" y2="721" stroke="#111" stroke-width="10"/>
+        <polyline points="338,612 386,600" stroke="#e8b08a" stroke-width="15"/>
+        <polyline points="386,600 430,576" stroke="#e03131" stroke-width="14"/>
+        <line x1="430" y1="575" x2="448" y2="566" stroke="#111" stroke-width="11"/>
+        <line x1="310" y1="535" x2="329" y2="598" stroke="#e03131" stroke-width="38"/>
+        <line x1="316" y1="546" x2="282" y2="527" stroke="#e03131" stroke-width="13"/>
+        <line x1="322" y1="552" x2="348" y2="559" stroke="#e03131" stroke-width="13"/>
+        <line x1="322" y1="600" x2="342" y2="612" stroke="#fff" stroke-width="30"/>
+      </g>
+      <circle cx="302" cy="506" r="17" fill="#e8b08a"/>
+      <path d="M286 503a17 17 0 0 1 33-4z" fill="#2b1a10"/>
+
+      <!-- 공이 날아온 궤적 + 속도선 -->
+      <path d="M445 568Q820 380 1206 520" stroke="url(#trail)" stroke-width="16" stroke-linecap="round" fill="none"/>
+      <g stroke="#fff" stroke-opacity="0.55" stroke-width="3" stroke-linecap="round">
+        <line x1="1140" y1="503" x2="1192" y2="510"/>
+        <line x1="1130" y1="526" x2="1188" y2="527"/>
+        <line x1="1148" y1="548" x2="1194" y2="541"/>
+      </g>
+
+      <!-- 골키퍼: 몸을 날렸지만 장갑 끝이 공에 닿기 직전 -->
+      <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <line x1="1425" y1="586" x2="1476" y2="574" stroke="#e8b08a" stroke-width="14"/>
+        <line x1="1420" y1="591" x2="1470" y2="612" stroke="#e8b08a" stroke-width="14"/>
+        <line x1="1462" y1="576" x2="1484" y2="571" stroke="#111" stroke-width="15"/>
+        <line x1="1458" y1="607" x2="1478" y2="616" stroke="#111" stroke-width="15"/>
+        <line x1="1400" y1="576" x2="1424" y2="587" stroke="#111" stroke-width="30"/>
+        <line x1="1332" y1="555" x2="1400" y2="576" stroke="#ffd43b" stroke-width="36"/>
+        <line x1="1336" y1="549" x2="1286" y2="526" stroke="#ffd43b" stroke-width="13"/>
+        <line x1="1332" y1="562" x2="1284" y2="548" stroke="#ffd43b" stroke-width="13"/>
+      </g>
+      <circle cx="1276" cy="523" r="10" fill="#f8f9fa"/>
+      <circle cx="1274" cy="546" r="10" fill="#f8f9fa"/>
+      <circle cx="1312" cy="536" r="16" fill="#e8b08a"/>
+      <path d="M1298 528a16 16 0 0 1 30 2z" fill="#111"/>
+
+      <!-- 공 -->
+      <circle cx="1230" cy="522" r="48" fill="url(#light)" opacity="0.45"/>
+      <g transform="translate(1230 522) rotate(18)">
+        <circle r="24" fill="#fff" stroke="#222" stroke-width="2"/>
+        <g clip-path="url(#ball-clip)" fill="#222">
+          <use href="#patch"/>
+          <use href="#patch" transform="translate(12.9 -17.8) rotate(36)"/>
+          <use href="#patch" transform="translate(20.9 6.8) rotate(36)"/>
+          <use href="#patch" transform="translate(0 22) rotate(36)"/>
+          <use href="#patch" transform="translate(-20.9 6.8) rotate(36)"/>
+          <use href="#patch" transform="translate(-12.9 -17.8) rotate(36)"/>
+        </g>
+      </g>
+
+      <!-- 가장자리를 어둡게 해서 장면에 집중 -->
+      <rect width="1600" height="900" fill="url(#vignette)"/>
+    </svg>
+  </div>
+
+  <main class="card">
+    <header class="scoreboard">
+      <h1><span class="ball">⚽</span> 오늘의 할 일</h1>
+      <div class="score">
+        <span>남은 할 일 <strong id="remaining-count">0</strong></span>
+        <span class="colon">:</span>
+        <span>완료 <strong id="done-count">0</strong></span>
+      </div>
+    </header>
+
+    <section class="content">
+      <form id="todo-form" class="todo-form">
+        <input id="todo-input" type="text" placeholder="할 일 입력..." autocomplete="off">
+        <button type="submit">추가</button>
+      </form>
+
+      <ul id="todo-list" class="todo-list"></ul>
+      <p id="empty-message" class="empty">킥오프! 첫 할 일을 추가해 보세요.</p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

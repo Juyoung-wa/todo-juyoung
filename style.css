@@ -1,0 +1,211 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 56px 16px;
+  font-family: system-ui, "Malgun Gothic", sans-serif;
+  color: #1f2a1f;
+  background: #0b1a3a;
+}
+
+/* 배경 그림 (골 직전 장면): 화면 전체에 고정 */
+.scene {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.scene svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 관중석 카메라 플래시 반짝임 */
+.flash {
+  opacity: 0;
+  animation: flash 2.4s infinite;
+}
+
+.flash:nth-child(2) { animation-delay: 0.7s; }
+.flash:nth-child(3) { animation-delay: 1.3s; }
+.flash:nth-child(4) { animation-delay: 1.9s; }
+.flash:nth-child(5) { animation-delay: 0.4s; }
+.flash:nth-child(6) { animation-delay: 1.6s; }
+
+@keyframes flash {
+  0%, 88%, 100% { opacity: 0; }
+  92% { opacity: 1; }
+}
+
+/* 가운데 카드 */
+.card {
+  position: relative; /* 배경 그림보다 카드가 위에 보이게 */
+  max-width: 440px;
+  margin: 0 auto;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(0, 40, 10, 0.35);
+}
+
+/* 위쪽 전광판 */
+.scoreboard {
+  padding: 22px 24px 18px;
+  background: linear-gradient(135deg, #123d1c, #1d5e2b);
+  color: #fff;
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.02em;
+}
+
+.ball {
+  display: inline-block;
+  animation: spin 6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.score {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 8px 18px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 10px;
+  font-size: 0.85rem;
+}
+
+.score strong {
+  display: block;
+  font-family: "Consolas", monospace;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  color: #ffd84d;
+}
+
+.score .colon {
+  font-size: 1.4rem;
+  opacity: 0.6;
+}
+
+.content {
+  padding: 22px 24px 24px;
+}
+
+/* 입력칸 + 추가 버튼 */
+.todo-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.todo-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 2px solid #dfe6df;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.todo-form input:focus {
+  outline: none;
+  border-color: #2f9e44;
+  box-shadow: 0 0 0 4px rgba(47, 158, 68, 0.15);
+}
+
+.todo-form button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #2f9e44;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.todo-form button:hover {
+  background: #26863a;
+}
+
+.todo-form button:active {
+  transform: scale(0.96);
+}
+
+/* 할 일 목록 */
+.todo-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  padding: 12px 14px;
+  background: #f5f8f5;
+  border-left: 4px solid #2f9e44;
+  border-radius: 10px;
+}
+
+.todo-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #2f9e44;
+  cursor: pointer;
+}
+
+.todo-item .text {
+  flex: 1;
+  word-break: break-all;
+}
+
+/* 완료한 할 일은 흐리게, 가운데 줄 */
+.todo-item.done {
+  border-left-color: #c3ccc3;
+  background: #fafbfa;
+}
+
+.todo-item.done .text {
+  color: #9aa59a;
+  text-decoration: line-through;
+}
+
+.delete-button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: #a8b0a8;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.delete-button:hover {
+  background: #fde8e8;
+  color: #e03131;
+}
+
+.empty {
+  margin: 20px 0 4px;
+  color: #8a958a;
+  text-align: center;
+}
