@@ -1,6 +1,7 @@
 // 화면에서 사용할 요소들
 const form = document.getElementById("todo-form");
 const input = document.getElementById("todo-input");
+const authorInput = document.getElementById("author-input");
 const addButton = form.querySelector("button");
 const list = document.getElementById("todo-list");
 const emptyMessage = document.getElementById("empty-message");
@@ -65,9 +66,21 @@ function render() {
     checkbox.checked = todo.done;
     checkbox.addEventListener("change", () => toggleTodo(todo.id));
 
-    const text = document.createElement("span");
+    // 할 일 내용과, 이름이 있으면 그 아래 작은 글씨로 작성자
+    const body = document.createElement("div");
+    body.className = "body";
+
+    const text = document.createElement("div");
     text.className = "text";
     text.textContent = todo.text;
+    body.append(text);
+
+    if (todo.author) {
+      const author = document.createElement("div");
+      author.className = "author";
+      author.textContent = `✎ ${todo.author}`;
+      body.append(author);
+    }
 
     const deleteButton = document.createElement("button");
     deleteButton.className = "delete-button";
@@ -75,7 +88,7 @@ function render() {
     deleteButton.title = "삭제";
     deleteButton.addEventListener("click", () => deleteTodo(todo.id));
 
-    item.append(checkbox, text, deleteButton);
+    item.append(checkbox, body, deleteButton);
     list.append(item);
   }
 
@@ -89,15 +102,16 @@ function render() {
 
 function loadTodos() {
   return run("할 일을 불러오지 못했어요", async () => {
-    todos = await request("todos?select=id,text,done&order=id.asc");
+    todos = await request("todos?select=id,text,done,author&order=id.asc");
   });
 }
 
-function addTodo(text) {
+// author가 빈 글자면 이름 없이(null) 저장
+function addTodo(text, author) {
   return run("할 일을 추가하지 못했어요", async () => {
     const [created] = await request("todos", {
       method: "POST",
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text, author: author || null }),
     });
     todos.push(created);
   });
@@ -139,7 +153,8 @@ form.addEventListener("submit", async (event) => {
 
   // 저장하는 동안 버튼을 잠가서 같은 할 일이 두 번 저장되지 않게 함
   addButton.disabled = true;
-  await addTodo(text);
+  // 이름 칸은 비워도 됨. 다음 할 일에도 같은 이름을 쓰기 쉽게 지우지 않고 둠
+  await addTodo(text, authorInput.value.trim());
   addButton.disabled = false;
 
   // 저장에 성공했을 때만 입력칸 비우기 (실패하면 다시 시도할 수 있게 남겨 둠)

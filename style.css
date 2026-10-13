@@ -110,6 +110,24 @@ h1 {
   margin-bottom: 12px;
 }
 
+/* 작성자 이름 칸 (할 일 입력칸 위) */
+.author-input {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 10px 14px;
+  border: 2px solid #dfe6df;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.author-input:focus {
+  outline: none;
+  border-color: #2f9e44;
+  box-shadow: 0 0 0 4px rgba(47, 158, 68, 0.15);
+}
+
 .todo-form input {
   flex: 1;
   min-width: 0;
@@ -171,8 +189,20 @@ h1 {
   cursor: pointer;
 }
 
-.todo-item .text {
+/* 할 일 내용 + 그 아래 작성자 이름 */
+.todo-item .body {
   flex: 1;
+  min-width: 0;
+}
+
+.todo-item .text {
+  word-break: break-all;
+}
+
+.todo-item .author {
+  margin-top: 2px;
+  color: #8a958a;
+  font-size: 0.78rem;
   word-break: break-all;
 }
 
