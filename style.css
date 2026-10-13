@@ -204,6 +204,23 @@ h1 {
   color: #e03131;
 }
 
+/* 오류 메시지 (빨간 상자) */
+.error {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  background: #fff0f0;
+  border: 1px solid #ffc9c9;
+  border-radius: 10px;
+  color: #c92a2a;
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
+.todo-form button:disabled {
+  background: #9cc9a6;
+  cursor: wait;
+}
+
 .empty {
   margin: 20px 0 4px;
   color: #8a958a;
