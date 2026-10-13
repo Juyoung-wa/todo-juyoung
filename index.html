@@ -168,7 +168,10 @@
     </header>
 
     <section class="content">
-      <input id="author-input" class="author-input" type="text" placeholder="작성자 이름 (선택)" autocomplete="off">
+      <div class="todo-options">
+        <input id="author-input" class="option-input" type="text" placeholder="작성자 이름 (선택)" autocomplete="off">
+        <input id="due-input" class="option-input due-input" type="date" title="마감일 (선택)" aria-label="마감일 (선택)">
+      </div>
 
       <form id="todo-form" class="todo-form">
         <input id="todo-input" type="text" placeholder="할 일 입력..." autocomplete="off">

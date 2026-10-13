@@ -2,6 +2,7 @@
 const form = document.getElementById("todo-form");
 const input = document.getElementById("todo-input");
 const authorInput = document.getElementById("author-input");
+const dueInput = document.getElementById("due-input");
 const addButton = form.querySelector("button");
 const list = document.getElementById("todo-list");
 const emptyMessage = document.getElementById("empty-message");
@@ -53,9 +54,43 @@ async function run(failMessage, action) {
   render();
 }
 
+// 마감이 가까운 순서로 정렬. 마감일이 없는 할 일은 맨 아래, 같으면 먼저 추가한 순서
+// 마감일은 "2026-10-15" 같은 글자라서 글자 순서로 비교해도 날짜 순서와 같음
+function sortTodos() {
+  todos.sort((a, b) => {
+    if (a.due_date !== b.due_date) {
+      if (!a.due_date) return 1;
+      if (!b.due_date) return -1;
+      return a.due_date < b.due_date ? -1 : 1;
+    }
+    return a.id - b.id;
+  });
+}
+
+// 마감일을 "10월 15일 (D-2)"처럼 바꾸고, 오늘/지남 여부도 함께 돌려주기
+function describeDueDate(dueDate) {
+  const [year, month, day] = dueDate.split("-").map(Number);
+  const due = new Date(year, month - 1, day);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const daysLeft = Math.round((due - today) / (24 * 60 * 60 * 1000));
+
+  let dDay;
+  if (daysLeft > 0) dDay = `D-${daysLeft}`;
+  else if (daysLeft === 0) dDay = "오늘";
+  else dDay = `${-daysLeft}일 지남`;
+
+  const yearText = year === today.getFullYear() ? "" : `${year}년 `;
+  return {
+    label: `📅 ${yearText}${month}월 ${day}일 (${dDay})`,
+    state: daysLeft === 0 ? "today" : daysLeft < 0 ? "overdue" : "",
+  };
+}
+
 // 할 일 목록을 화면에 다시 그리기
 function render() {
   list.innerHTML = "";
+  sortTodos();
 
   for (const todo of todos) {
     const item = document.createElement("li");
@@ -66,7 +101,7 @@ function render() {
     checkbox.checked = todo.done;
     checkbox.addEventListener("change", () => toggleTodo(todo.id));
 
-    // 할 일 내용과, 이름이 있으면 그 아래 작은 글씨로 작성자
+    // 할 일 내용과, 그 아래 작은 글씨로 작성자 · 마감일 (있는 것만)
     const body = document.createElement("div");
     body.className = "body";
 
@@ -75,12 +110,24 @@ function render() {
     text.textContent = todo.text;
     body.append(text);
 
+    const meta = document.createElement("div");
+    meta.className = "meta";
+
     if (todo.author) {
-      const author = document.createElement("div");
-      author.className = "author";
+      const author = document.createElement("span");
       author.textContent = `✎ ${todo.author}`;
-      body.append(author);
+      meta.append(author);
     }
+
+    if (todo.due_date) {
+      const { label, state } = describeDueDate(todo.due_date);
+      const due = document.createElement("span");
+      due.className = `due ${state}`;
+      due.textContent = label;
+      meta.append(due);
+    }
+
+    if (meta.childElementCount > 0) body.append(meta);
 
     const deleteButton = document.createElement("button");
     deleteButton.className = "delete-button";
@@ -102,16 +149,16 @@ function render() {
 
 function loadTodos() {
   return run("할 일을 불러오지 못했어요", async () => {
-    todos = await request("todos?select=id,text,done,author&order=id.asc");
+    todos = await request("todos?select=id,text,done,author,due_date");
   });
 }
 
-// author가 빈 글자면 이름 없이(null) 저장
-function addTodo(text, author) {
+// author, dueDate가 빈 글자면 없음(null)으로 저장
+function addTodo(text, author, dueDate) {
   return run("할 일을 추가하지 못했어요", async () => {
     const [created] = await request("todos", {
       method: "POST",
-      body: JSON.stringify({ text, author: author || null }),
+      body: JSON.stringify({ text, author: author || null, due_date: dueDate || null }),
     });
     todos.push(created);
   });
@@ -154,11 +201,15 @@ form.addEventListener("submit", async (event) => {
   // 저장하는 동안 버튼을 잠가서 같은 할 일이 두 번 저장되지 않게 함
   addButton.disabled = true;
   // 이름 칸은 비워도 됨. 다음 할 일에도 같은 이름을 쓰기 쉽게 지우지 않고 둠
-  await addTodo(text, authorInput.value.trim());
+  // 마감일 칸도 비워도 됨 (값은 "2026-10-15" 같은 글자)
+  await addTodo(text, authorInput.value.trim(), dueInput.value);
   addButton.disabled = false;
 
-  // 저장에 성공했을 때만 입력칸 비우기 (실패하면 다시 시도할 수 있게 남겨 둠)
-  if (errorMessage.hidden) input.value = "";
+  // 저장에 성공했을 때만 할 일·마감일 칸 비우기 (실패하면 다시 시도할 수 있게 남겨 둠)
+  if (errorMessage.hidden) {
+    input.value = "";
+    dueInput.value = "";
+  }
   input.focus();
 });
 
