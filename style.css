@@ -208,6 +208,22 @@ h1 {
 
 .todo-item .text {
   word-break: break-all;
+  cursor: text;
+}
+
+/* 글자를 두 번 눌렀을 때 나오는 고치기 입력칸 */
+.edit-input {
+  width: 100%;
+  padding: 4px 8px;
+  border: 2px solid #2f9e44;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.edit-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(47, 158, 68, 0.15);
 }
 
 /* 할 일 아래 작은 글씨 줄: 작성자 · 마감일 */

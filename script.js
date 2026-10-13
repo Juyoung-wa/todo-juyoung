@@ -13,6 +13,11 @@ const doneCount = document.getElementById("done-count");
 // 할 일 목록 (Supabase의 todos 표에서 불러온 내용을 화면용으로 들고 있음)
 let todos = [];
 
+// 지금 고치고 있는 할 일의 번호(없으면 null)와, 고치는 중인 글자
+let editingId = null;
+let editDraft = "";
+let savingEdit = false;
+
 // Supabase의 todos 표에 요청을 보내고, 결과(할 일 배열)를 돌려받기
 // SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY는 config.js에 있음
 async function request(path, options = {}) {
@@ -91,6 +96,7 @@ function describeDueDate(dueDate) {
 function render() {
   list.innerHTML = "";
   sortTodos();
+  let editInput = null;
 
   for (const todo of todos) {
     const item = document.createElement("li");
@@ -105,9 +111,26 @@ function render() {
     const body = document.createElement("div");
     body.className = "body";
 
-    const text = document.createElement("div");
-    text.className = "text";
-    text.textContent = todo.text;
+    let text;
+    if (todo.id === editingId) {
+      // 고치는 중이면 글자 대신 입력칸을 보여 줌
+      text = document.createElement("input");
+      text.className = "edit-input";
+      text.value = editDraft;
+      text.addEventListener("input", () => (editDraft = text.value));
+      text.addEventListener("keydown", (event) => {
+        if (event.isComposing) return; // 한글 조합 중에 누른 Enter/Esc는 무시
+        if (event.key === "Enter") saveEdit(todo.id);
+        else if (event.key === "Escape") cancelEdit();
+      });
+      editInput = text;
+    } else {
+      text = document.createElement("div");
+      text.className = "text";
+      text.textContent = todo.text;
+      text.title = "두 번 눌러서 고치기";
+      text.addEventListener("dblclick", () => startEdit(todo.id));
+    }
     body.append(text);
 
     const meta = document.createElement("div");
@@ -137,6 +160,12 @@ function render() {
 
     item.append(checkbox, body, deleteButton);
     list.append(item);
+  }
+
+  // 고치는 입력칸이 있으면 바로 입력할 수 있게 커서를 글자 끝에 둠
+  if (editInput) {
+    editInput.focus();
+    editInput.setSelectionRange(editInput.value.length, editInput.value.length);
   }
 
   emptyMessage.hidden = todos.length > 0;
@@ -175,6 +204,44 @@ function toggleTodo(id) {
     if (!updated) throw new Error("바뀐 할 일이 없어요. 권한이 없거나 이미 지워졌을 수 있어요.");
     todo.done = updated.done;
   });
+}
+
+// 할 일 글자를 두 번 누르면 고치기 시작 (다른 할 일을 고치던 중이면 그건 취소됨)
+function startEdit(id) {
+  editingId = id;
+  editDraft = todos.find((t) => t.id === id).text;
+  render();
+}
+
+// Esc: 고친 내용을 버리고 원래 글자로 돌아가기
+function cancelEdit() {
+  editingId = null;
+  render();
+}
+
+// Enter: 고친 내용을 Supabase에 저장
+async function saveEdit(id) {
+  if (savingEdit) return; // 저장 중에 Enter를 또 누르면 무시
+  const todo = todos.find((t) => t.id === id);
+  const newText = editDraft.trim();
+
+  // 비웠거나 바뀐 게 없으면 저장하지 않고 원래대로
+  if (newText === "" || newText === todo.text) {
+    cancelEdit();
+    return;
+  }
+
+  savingEdit = true;
+  await run("할 일을 고치지 못했어요", async () => {
+    const [updated] = await request(`todos?id=eq.${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ text: newText }),
+    });
+    if (!updated) throw new Error("바뀐 할 일이 없어요. 권한이 없거나 이미 지워졌을 수 있어요.");
+    todo.text = updated.text;
+    editingId = null; // 성공했을 때만 고치기 끝 (실패하면 입력칸과 고친 글자를 그대로 둠)
+  });
+  savingEdit = false;
 }
 
 function deleteTodo(id) {
