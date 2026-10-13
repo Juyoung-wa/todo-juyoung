@@ -175,6 +175,52 @@ h1 {
   transform: scale(0.96);
 }
 
+/* 전체·진행 중·완료 버튼 + 남은 개수 */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 4px 0 4px;
+}
+
+.filters {
+  display: flex;
+  gap: 6px;
+}
+
+.filter-button {
+  padding: 6px 12px;
+  border: 1px solid #dfe6df;
+  border-radius: 999px;
+  background: #fff;
+  color: #4a554a;
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.filter-button:hover {
+  border-color: #2f9e44;
+}
+
+.filter-button.active {
+  background: #2f9e44;
+  border-color: #2f9e44;
+  color: #fff;
+}
+
+.remaining {
+  color: #6b766b;
+  font-size: 0.85rem;
+}
+
+.remaining strong {
+  color: #2f9e44;
+}
+
 /* 할 일 목록 */
 .todo-list {
   list-style: none;

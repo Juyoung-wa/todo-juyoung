@@ -9,6 +9,11 @@ const emptyMessage = document.getElementById("empty-message");
 const errorMessage = document.getElementById("error-message");
 const remainingCount = document.getElementById("remaining-count");
 const doneCount = document.getElementById("done-count");
+const remainingText = document.getElementById("remaining-text");
+const filterButtons = document.querySelectorAll(".filter-button");
+
+// 지금 골라 보는 목록: "all"(전체), "active"(진행 중), "done"(완료)
+let filter = "all";
 
 // 할 일 목록 (Supabase의 todos 표에서 불러온 내용을 화면용으로 들고 있음)
 let todos = [];
@@ -98,7 +103,14 @@ function render() {
   sortTodos();
   let editInput = null;
 
-  for (const todo of todos) {
+  // 고른 버튼에 맞는 할 일만 보여 주기
+  const visibleTodos = todos.filter((t) => {
+    if (filter === "active") return !t.done;
+    if (filter === "done") return t.done;
+    return true;
+  });
+
+  for (const todo of visibleTodos) {
     const item = document.createElement("li");
     item.className = "todo-item" + (todo.done ? " done" : "");
 
@@ -168,12 +180,31 @@ function render() {
     editInput.setSelectionRange(editInput.value.length, editInput.value.length);
   }
 
-  emptyMessage.hidden = todos.length > 0;
+  // 보여 줄 할 일이 없으면 상황에 맞는 안내 문구
+  if (todos.length === 0) emptyMessage.textContent = "킥오프! 첫 할 일을 추가해 보세요.";
+  else if (filter === "active") emptyMessage.textContent = "진행 중인 할 일이 없어요. 모두 끝냈어요! 🎉";
+  else emptyMessage.textContent = "아직 완료한 할 일이 없어요.";
+  emptyMessage.hidden = visibleTodos.length > 0;
 
-  // 전광판 점수 갱신
+  // 고른 버튼을 초록색으로 표시
+  for (const button of filterButtons) {
+    const selected = button.dataset.filter === filter;
+    button.classList.toggle("active", selected);
+    button.setAttribute("aria-pressed", selected);
+  }
+
+  // 전광판 점수와 목록 위 남은 개수 갱신 (어떤 버튼을 골랐든 전체 기준)
   const done = todos.filter((t) => t.done).length;
   doneCount.textContent = done;
   remainingCount.textContent = todos.length - done;
+  remainingText.textContent = todos.length - done;
+}
+
+for (const button of filterButtons) {
+  button.addEventListener("click", () => {
+    filter = button.dataset.filter;
+    render();
+  });
 }
 
 function loadTodos() {

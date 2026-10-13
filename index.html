@@ -180,6 +180,15 @@
 
       <p id="error-message" class="error" hidden></p>
 
+      <div class="filter-bar">
+        <div class="filters" role="group" aria-label="할 일 골라 보기">
+          <button type="button" class="filter-button active" data-filter="all" aria-pressed="true">전체</button>
+          <button type="button" class="filter-button" data-filter="active" aria-pressed="false">진행 중</button>
+          <button type="button" class="filter-button" data-filter="done" aria-pressed="false">완료</button>
+        </div>
+        <span class="remaining">남은 할 일 <strong id="remaining-text">0</strong>개</span>
+      </div>
+
       <ul id="todo-list" class="todo-list"></ul>
       <p id="empty-message" class="empty">킥오프! 첫 할 일을 추가해 보세요.</p>
     </section>
