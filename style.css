@@ -16,6 +16,13 @@ body {
   position: fixed;
   inset: 0;
   pointer-events: none;
+  background: #060f26; /* 핸드폰처럼 그림이 화면보다 작을 때 남는 곳은 밤하늘 색 */
+}
+
+/* 날아가는 공: 할 일 카드보다 앞에 보이게 (pointer-events: none이라 카드는 그대로 누를 수 있음) */
+.scene-front {
+  z-index: 1;
+  background: none;
 }
 
 .scene svg {
@@ -39,6 +46,143 @@ body {
 @keyframes flash {
   0%, 88%, 100% { opacity: 0; }
   92% { opacity: 1; }
+}
+
+/* ---------- 슛 장면 (shot.js) ---------- */
+
+/* 움직이는 부분들: 회전·확대의 기준점을 배경 그림 좌표로 잡음 */
+#kick-leg,
+#keeper,
+#goal-net,
+#goal-frame {
+  transform-box: view-box;
+}
+
+/* 평소엔 차는 다리를 뒤로 젖히고 찰 준비 (엉덩이를 중심으로 돌림) */
+#kick-leg {
+  transform-origin: 338px 612px;
+  transform: rotate(140deg);
+}
+
+/* 골키퍼는 발밑을 중심으로 몸을 날림 */
+#keeper {
+  transform-origin: 1340px 698px;
+}
+
+#goal-net {
+  transform-origin: 1340px 595px;
+}
+
+/* 발 앞의 공: 찰 때는 바로 숨고, 다시 나타날 때는 천천히 */
+.rest-ball {
+  transition: opacity 0.4s;
+}
+
+.rest-ball.hidden {
+  opacity: 0;
+  transition: none;
+}
+
+#flying-ball,
+#hit-spark {
+  opacity: 0;
+}
+
+#hit-spark {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* 맨 앞줄 관중: 평소엔 앉아 있다가, 골이 들어가면 일어나서 팔을 들고 폴짝폴짝 */
+.fan {
+  transform: translateY(14px);
+}
+
+.fan .arms {
+  opacity: 0;
+}
+
+.cheering .fan {
+  animation: cheer 0.45s ease-in-out infinite alternate;
+}
+
+.cheering .fan .arms {
+  opacity: 1;
+}
+
+@keyframes cheer {
+  from { transform: translateY(-2px); }
+  to { transform: translateY(-16px); }
+}
+
+/* 골이 들어가면 카메라 플래시도 정신없이 터짐 */
+.cheering .flash {
+  animation-duration: 0.5s;
+}
+
+/* 슛 결과 문구 */
+.shot-message {
+  position: fixed;
+  top: 22%;
+  left: 50%;
+  z-index: 2;
+  max-width: calc(100% - 32px);
+  padding: 12px 22px;
+  background: rgba(6, 15, 38, 0.88);
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  color: #fff;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.8);
+  transition: opacity 0.25s, transform 0.25s;
+}
+
+.shot-message.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.shot-message strong {
+  display: block;
+  font-size: 1.2rem;
+}
+
+.shot-message span {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.shot-message.post strong {
+  color: #ffd84d;
+}
+
+.shot-message.far strong {
+  color: #ffa8a8;
+}
+
+.shot-message.goal {
+  padding: 18px 36px;
+}
+
+.shot-message.goal strong {
+  font-size: 3.4rem;
+  letter-spacing: 0.06em;
+  color: #ffd84d;
+  text-shadow: 0 4px 0 #b8860b;
+}
+
+.shot-message.goal.show {
+  animation: goal-pop 0.6s ease-out;
+}
+
+@keyframes goal-pop {
+  0% { transform: translate(-50%, -50%) scale(0.3); }
+  60% { transform: translate(-50%, -50%) scale(1.15); }
+  100% { transform: translate(-50%, -50%) scale(1); }
 }
 
 /* 가운데 카드 */

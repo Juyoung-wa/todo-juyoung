@@ -234,6 +234,9 @@ function toggleTodo(id) {
     // 오류 없이 아무것도 안 바뀌는 경우(권한이 없을 때 등)도 실패로 알려 주기
     if (!updated) throw new Error("바뀐 할 일이 없어요. 권한이 없거나 이미 지워졌을 수 있어요.");
     todo.done = updated.done;
+
+    // 완료로 바꿨을 때만 배경의 선수가 슛! 완료 비율이 높을수록 골문 가까이 (shot.js)
+    if (todo.done) shoot(todos.filter((t) => t.done).length, todos.length);
   });
 }
 

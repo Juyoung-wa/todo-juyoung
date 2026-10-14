@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- 배경 그림: 선수가 찬 공이 골문에 들어가기 직전의 순간 -->
+  <!-- 배경 그림: 선수가 공을 찰 준비를 하고 있는 경기장 (할 일을 체크하면 슛! → shot.js) -->
   <div class="scene" aria-hidden="true">
     <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
       <defs>
@@ -29,16 +29,24 @@
         <pattern id="net" width="16" height="16" patternUnits="userSpaceOnUse">
           <path d="M0 0L16 16M16 0L0 16" stroke="#fff" stroke-opacity="0.4" stroke-width="1"/>
         </pattern>
-        <linearGradient id="trail" gradientUnits="userSpaceOnUse" x1="440" y1="0" x2="1210" y2="0">
-          <stop offset="0" stop-color="#fff" stop-opacity="0"/>
-          <stop offset="1" stop-color="#fff" stop-opacity="0.6"/>
-        </linearGradient>
         <radialGradient id="vignette" cx="0.5" cy="0.55" r="0.75">
           <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
           <stop offset="1" stop-color="#000" stop-opacity="0.55"/>
         </radialGradient>
         <clipPath id="ball-clip"><circle r="24"/></clipPath>
         <polygon id="patch" points="0,-8 7.6,-2.5 4.7,6.5 -4.7,6.5 -7.6,-2.5"/>
+        <!-- 공 그림 (발 앞에 놓인 공과 날아가는 공이 함께 씀) -->
+        <g id="ball-art">
+          <circle r="24" fill="#fff" stroke="#222" stroke-width="2"/>
+          <g clip-path="url(#ball-clip)" fill="#222">
+            <use href="#patch"/>
+            <use href="#patch" transform="translate(12.9 -17.8) rotate(36)"/>
+            <use href="#patch" transform="translate(20.9 6.8) rotate(36)"/>
+            <use href="#patch" transform="translate(0 22) rotate(36)"/>
+            <use href="#patch" transform="translate(-20.9 6.8) rotate(36)"/>
+            <use href="#patch" transform="translate(-12.9 -17.8) rotate(36)"/>
+          </g>
+        </g>
       </defs>
 
       <!-- 밤하늘 + 조명탑 -->
@@ -59,6 +67,9 @@
         <circle class="flash" cx="1540" cy="370" r="6"/>
       </g>
 
+      <!-- 맨 앞줄 관중 (shot.js가 채움). 광고판보다 먼저 그려서 몸 아래쪽은 광고판에 가려짐 -->
+      <g id="fans"></g>
+
       <!-- 광고판 -->
       <rect y="410" width="1600" height="26" fill="#1d5e2b"/>
       <rect y="410" width="1600" height="3" fill="#ffd43b"/>
@@ -76,36 +87,39 @@
       </g>
 
       <!-- 골대: 그물 -> 뒤 프레임 -> 앞 골포스트 -->
-      <g fill="url(#net)">
-        <rect x="1215" y="500" width="250" height="190"/>
-        <polygon points="1180,470 1215,500 1215,690 1180,700"/>
-        <polygon points="1500,470 1465,500 1465,690 1500,700"/>
-        <polygon points="1180,470 1500,470 1465,500 1215,500"/>
+      <g id="goal-net">
+        <g fill="url(#net)">
+          <rect x="1215" y="500" width="250" height="190"/>
+          <polygon points="1180,470 1215,500 1215,690 1180,700"/>
+          <polygon points="1500,470 1465,500 1465,690 1500,700"/>
+          <polygon points="1180,470 1500,470 1465,500 1215,500"/>
+        </g>
+        <g stroke="#fff" stroke-opacity="0.55" stroke-width="3" fill="none">
+          <polyline points="1215,690 1215,500 1465,500 1465,690"/>
+        </g>
       </g>
-      <g stroke="#fff" stroke-opacity="0.55" stroke-width="3" fill="none">
-        <polyline points="1215,690 1215,500 1465,500 1465,690"/>
-      </g>
-      <g stroke="#fff" stroke-width="10" stroke-linecap="round" fill="none">
+      <g id="goal-frame" stroke="#fff" stroke-width="10" stroke-linecap="round" fill="none">
         <polyline points="1180,700 1180,470 1500,470 1500,700"/>
       </g>
 
       <!-- 그림자 -->
       <g fill="#000" opacity="0.3">
         <ellipse cx="335" cy="722" rx="60" ry="8"/>
-        <ellipse cx="1385" cy="702" rx="75" ry="8"/>
-        <ellipse cx="1225" cy="699" rx="20" ry="4"/>
+        <ellipse cx="1340" cy="701" rx="45" ry="7"/>
       </g>
 
-      <!-- 공격수: 공을 차고 난 뒤 다리를 뻗은 자세 -->
+      <!-- 공격수: 차는 다리(kick-leg)를 뒤로 젖히고 찰 준비를 한 자세 -->
       <g stroke-linecap="round" stroke-linejoin="round" fill="none">
         <polyline points="314,545 272,520 250,536" stroke="#e8b08a" stroke-width="11"/>
         <polyline points="320,550 356,562 382,548" stroke="#e8b08a" stroke-width="11"/>
         <polyline points="330,610 322,665" stroke="#e8b08a" stroke-width="15"/>
         <polyline points="322,665 318,716" stroke="#e03131" stroke-width="14"/>
         <line x1="316" y1="719" x2="340" y2="721" stroke="#111" stroke-width="10"/>
-        <polyline points="338,612 386,600" stroke="#e8b08a" stroke-width="15"/>
-        <polyline points="386,600 430,576" stroke="#e03131" stroke-width="14"/>
-        <line x1="430" y1="575" x2="448" y2="566" stroke="#111" stroke-width="11"/>
+        <g id="kick-leg">
+          <polyline points="338,612 386,600" stroke="#e8b08a" stroke-width="15"/>
+          <polyline points="386,600 430,576" stroke="#e03131" stroke-width="14"/>
+          <line x1="430" y1="575" x2="448" y2="566" stroke="#111" stroke-width="11"/>
+        </g>
         <line x1="310" y1="535" x2="329" y2="598" stroke="#e03131" stroke-width="38"/>
         <line x1="316" y1="546" x2="282" y2="527" stroke="#e03131" stroke-width="13"/>
         <line x1="322" y1="552" x2="348" y2="559" stroke="#e03131" stroke-width="13"/>
@@ -114,42 +128,28 @@
       <circle cx="302" cy="506" r="17" fill="#e8b08a"/>
       <path d="M286 503a17 17 0 0 1 33-4z" fill="#2b1a10"/>
 
-      <!-- 공이 날아온 궤적 + 속도선 -->
-      <path d="M445 568Q820 380 1206 520" stroke="url(#trail)" stroke-width="16" stroke-linecap="round" fill="none"/>
-      <g stroke="#fff" stroke-opacity="0.55" stroke-width="3" stroke-linecap="round">
-        <line x1="1140" y1="503" x2="1192" y2="510"/>
-        <line x1="1130" y1="526" x2="1188" y2="527"/>
-        <line x1="1148" y1="548" x2="1194" y2="541"/>
-      </g>
-
-      <!-- 골키퍼: 몸을 날렸지만 장갑 끝이 공에 닿기 직전 -->
-      <g stroke-linecap="round" stroke-linejoin="round" fill="none">
-        <line x1="1425" y1="586" x2="1476" y2="574" stroke="#e8b08a" stroke-width="14"/>
-        <line x1="1420" y1="591" x2="1470" y2="612" stroke="#e8b08a" stroke-width="14"/>
-        <line x1="1462" y1="576" x2="1484" y2="571" stroke="#111" stroke-width="15"/>
-        <line x1="1458" y1="607" x2="1478" y2="616" stroke="#111" stroke-width="15"/>
-        <line x1="1400" y1="576" x2="1424" y2="587" stroke="#111" stroke-width="30"/>
-        <line x1="1332" y1="555" x2="1400" y2="576" stroke="#ffd43b" stroke-width="36"/>
-        <line x1="1336" y1="549" x2="1286" y2="526" stroke="#ffd43b" stroke-width="13"/>
-        <line x1="1332" y1="562" x2="1284" y2="548" stroke="#ffd43b" stroke-width="13"/>
-      </g>
-      <circle cx="1276" cy="523" r="10" fill="#f8f9fa"/>
-      <circle cx="1274" cy="546" r="10" fill="#f8f9fa"/>
-      <circle cx="1312" cy="536" r="16" fill="#e8b08a"/>
-      <path d="M1298 528a16 16 0 0 1 30 2z" fill="#111"/>
-
-      <!-- 공 -->
-      <circle cx="1230" cy="522" r="48" fill="url(#light)" opacity="0.45"/>
-      <g transform="translate(1230 522) rotate(18)">
-        <circle r="24" fill="#fff" stroke="#222" stroke-width="2"/>
-        <g clip-path="url(#ball-clip)" fill="#222">
-          <use href="#patch"/>
-          <use href="#patch" transform="translate(12.9 -17.8) rotate(36)"/>
-          <use href="#patch" transform="translate(20.9 6.8) rotate(36)"/>
-          <use href="#patch" transform="translate(0 22) rotate(36)"/>
-          <use href="#patch" transform="translate(-20.9 6.8) rotate(36)"/>
-          <use href="#patch" transform="translate(-12.9 -17.8) rotate(36)"/>
+      <!-- 골키퍼: 골문 가운데에 서서 기다림 (슛이 오면 shot.js가 몸을 날리게 함) -->
+      <g id="keeper">
+        <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+          <line x1="1331" y1="655" x2="1326" y2="692" stroke="#e8b08a" stroke-width="13"/>
+          <line x1="1349" y1="655" x2="1354" y2="692" stroke="#e8b08a" stroke-width="13"/>
+          <line x1="1318" y1="697" x2="1331" y2="697" stroke="#111" stroke-width="9"/>
+          <line x1="1350" y1="697" x2="1363" y2="697" stroke="#111" stroke-width="9"/>
+          <line x1="1331" y1="647" x2="1349" y2="647" stroke="#111" stroke-width="26"/>
+          <line x1="1340" y1="588" x2="1340" y2="636" stroke="#ffd43b" stroke-width="36"/>
+          <line x1="1327" y1="592" x2="1300" y2="616" stroke="#ffd43b" stroke-width="12"/>
+          <line x1="1353" y1="592" x2="1380" y2="616" stroke="#ffd43b" stroke-width="12"/>
         </g>
+        <circle cx="1297" cy="619" r="10" fill="#f8f9fa"/>
+        <circle cx="1383" cy="619" r="10" fill="#f8f9fa"/>
+        <circle cx="1340" cy="558" r="16" fill="#e8b08a"/>
+        <path d="M1324 556a16 16 0 0 1 32 0z" fill="#111"/>
+      </g>
+
+      <!-- 공: 평소엔 선수 발 앞에 놓여 있음 (찰 때는 카드 앞쪽의 '날아가는 공'이 대신 날아감) -->
+      <g id="rest-ball" class="rest-ball">
+        <ellipse cx="424" cy="721" rx="22" ry="4" fill="#000" opacity="0.3"/>
+        <use href="#ball-art" transform="translate(424 697) rotate(18)"/>
       </g>
 
       <!-- 가장자리를 어둡게 해서 장면에 집중 -->
@@ -194,7 +194,22 @@
     </section>
   </main>
 
+  <!-- 날아가는 공: 할 일 카드보다 앞에 보이도록 배경과 따로 그림 (좌표는 배경 그림과 같음) -->
+  <div class="scene scene-front" aria-hidden="true">
+    <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+      <circle id="hit-spark" r="22" fill="none" stroke="#ffd84d" stroke-width="6"/>
+      <use id="flying-ball" href="#ball-art"/>
+    </svg>
+  </div>
+
+  <!-- 슛 결과 문구 (GOAL!, 아깝다! 등) -->
+  <div id="shot-message" class="shot-message" role="status" aria-live="polite">
+    <strong></strong>
+    <span></span>
+  </div>
+
   <script src="config.js"></script>
+  <script src="shot.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
